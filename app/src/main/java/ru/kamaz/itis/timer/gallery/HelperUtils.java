@@ -11,12 +11,16 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings.Global;
 
+
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -24,13 +28,12 @@ import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.FileProvider;
+//import androidx.annotation.Nullable;
+//import androidx.annotation.RequiresApi;
+//import androidx.core.app.NotificationCompat;
+//import androidx.core.content.FileProvider;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
@@ -46,12 +49,12 @@ import java.util.concurrent.TimeUnit;
 
 import ru.kamaz.itis.timer.BuildConfig;
 import ru.kamaz.itis.timer.gallery.constants.ConstantUtils;
-import ru.kamaz.itis.timer.gallery.domain.AppContainer;
-import ru.kamaz.itis.timer.gallery.domain.AppData;
-import ru.kamaz.itis.timer.gallery.domain.EnumFileType;
-import ru.kamaz.itis.timer.gallery.domain.GalleryPhotoAlbum;
+import ru.kamaz.itis.timer.gallery.domain.domain.AppContainer;
+import ru.kamaz.itis.timer.gallery.domain.domain.AppData;
+import ru.kamaz.itis.timer.gallery.domain.domain.EnumFileType;
+import ru.kamaz.itis.timer.gallery.domain.domain.GalleryPhotoAlbum;
 import ru.kamaz.itis.timer.gallery.domain.domain.Media;
-import ru.kamaz.itis.timer.gallery.domain.Photo;
+import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 
 
 public class HelperUtils {
@@ -351,7 +354,6 @@ public class HelperUtils {
     List<Photo> list = null;
     ContentResolver contentResolver = context.getContentResolver();
     Uri songUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-
     Cursor cursor = null;
     if (_bucketId != null && _bucketId != 0) {
       String selectionArg = MediaStore.Images.Media.BUCKET_ID + "=" + _bucketId;
@@ -367,7 +369,6 @@ public class HelperUtils {
       int songDisplayName = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
       int songData = cursor.getColumnIndex(MediaStore.Images.Media.DATA);
       int songBucketId = cursor.getColumnIndex(MediaStore.Images.Media.BUCKET_ID);
-
       do {
         long currentId = cursor.getLong(songId);
         String currentTitle = cursor.getString(songTitle);
@@ -386,9 +387,9 @@ public class HelperUtils {
     if (cursor != null) {
       cursor.close();
     }
-
-    Collections.reverse(list);
-
+    if(list!=null){
+      Collections.reverse(list);
+    }
     return list;
   }
 
@@ -606,6 +607,9 @@ Collections.reverse(photoList);
       Log.d(ConstantUtils.LOG_TAG, "curCursor size = " + list.size());
     } else {
       Log.d(ConstantUtils.LOG_TAG, "curCursor size = 0 or null");
+    }
+    if(list!=null){
+      Collections.reverse(list);
     }
     return list;
   }

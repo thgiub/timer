@@ -42,6 +42,7 @@ public class MediaPhotoPresenter implements MediaPhotoInterface.Presenter, MainI
     @Override
     public void onResume() {
         interactor.addListener(this);
+        view.updateGalleryList();
     }
 
     @Override
@@ -98,9 +99,14 @@ public class MediaPhotoPresenter implements MediaPhotoInterface.Presenter, MainI
 
     @Override
     public void addListener(boolean bool) {
-        if (false){
-            interactor.listenersAdd(bool);
-        }
+        //if (false){
+            //interactor.addListener(this);
+        //}
+    }
+
+    @Override
+    public void updateGallery() {
+        view.updateGalleryList();
     }
 
     @Override

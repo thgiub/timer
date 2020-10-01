@@ -1,16 +1,16 @@
 package ru.kamaz.itis.timer.gallery.presentation;
 
+
 import android.net.Uri;
 import android.os.Bundle;
 
-
-
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
+//import androidx.annotation.Nullable;
+//import androidx.appcompat.app.AppCompatActivity;
 
 
 
@@ -22,7 +22,7 @@ import ru.kamaz.itis.timer.R;
 import ru.kamaz.itis.timer.gallery.ExtendedViewPager;
 import ru.kamaz.itis.timer.gallery.HelperUtils;
 import ru.kamaz.itis.timer.gallery.constants.ConstantUtils;
-import ru.kamaz.itis.timer.gallery.domain.Photo;
+import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 
 public class PhotoViewActivity extends AppCompatActivity {
 

@@ -3,7 +3,6 @@ package ru.kamaz.itis.timer.gallery;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
 class MediaScannerBroadcast extends BroadcastReceiver {
 
     private final MediaScannerBroadcast.MediaScannerBroadcastListener listener;

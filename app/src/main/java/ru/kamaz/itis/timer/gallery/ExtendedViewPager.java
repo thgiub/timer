@@ -2,13 +2,14 @@ package ru.kamaz.itis.timer.gallery;
 
 import android.content.Context;
 
+
+import android.support.annotation.NonNull;
+import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.ViewPager;
 
-import ru.kamaz.itis.timer.gallery.TouchImageView;
+
 
 public class ExtendedViewPager extends ViewPager {
 
@@ -22,10 +23,6 @@ public class ExtendedViewPager extends ViewPager {
 
   @Override
   protected boolean canScroll(View v, boolean checkV, int dx, int x, int y) {
-    if (v instanceof TouchImageView) {
-      return ((TouchImageView) v).canScrollHorizontallyFroyo(-dx);
-    } else {
-      return super.canScroll(v, checkV, dx, x, y);
-    }
+    return super.canScroll(v, checkV, dx, x, y);
   }
 }

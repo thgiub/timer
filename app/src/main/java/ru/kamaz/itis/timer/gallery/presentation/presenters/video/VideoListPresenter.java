@@ -119,4 +119,9 @@ public class VideoListPresenter implements VideoInterface.Presenter,  MainIntera
            interactor.addListener(this);
         }
     }
+
+    @Override
+    public void updateGallery() {
+
+    }
 }

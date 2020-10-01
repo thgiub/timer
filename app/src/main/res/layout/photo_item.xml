@@ -1,10 +1,10 @@
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="170dp"
+    android:layout_height="100dp"
     android:gravity="center_horizontal"
-    android:padding="6dp">
+    android:padding="2dp">
 
   <ImageView
       android:id="@+id/img"
@@ -14,7 +14,6 @@
       app:layout_constraintEnd_toEndOf="parent"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-
       android:adjustViewBounds="true"/>
 
     <CheckBox
@@ -26,4 +25,20 @@
         android:clickable="true"
         android:background="@null"
         android:button="@drawable/select_drawable" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+  <TextView
+      android:id="@+id/text_pic"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:ellipsize="end"
+      android:fontFamily="@font/pfdindisplaypro"
+      android:maxLength="33"
+      android:maxLines="1"
+      android:singleLine="true"
+      android:textColor="@color/white"
+      android:textSize="@dimen/media_file_description_text_size"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent" />
+</android.support.constraint.ConstraintLayout>

@@ -3,19 +3,17 @@ package ru.kamaz.itis.timer.gallery.ui.ui.main;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
+
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
-
-
 
 
 import butterknife.BindView;
@@ -52,9 +50,10 @@ public class MediaPhotoPagerFragment extends Fragment implements MediaPhotoPager
   ConstraintLayout clEditButtons;
   Unbinder unbinder;
 
+  private MediaPhotoFragment mediaPhotoFragment;
+
+
   @SuppressLint("ValidFragment")
-
-
   public static MediaPhotoPagerFragment newInstance() {
     if (instance == null) {
       instance = new MediaPhotoPagerFragment();
@@ -66,14 +65,18 @@ public class MediaPhotoPagerFragment extends Fragment implements MediaPhotoPager
   @Override
   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                            @Nullable Bundle savedInstanceState) {
-    View v = inflater.inflate(R.layout.fragment_photo_pager, container, false);
-    unbinder = ButterKnife.bind(this, v);
+    return inflater.inflate(R.layout.fragment_photo_pager, container, false);
+  }
+
+  @Override
+  public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    super.onViewCreated(view, savedInstanceState);
+    unbinder = ButterKnife.bind(this, view);
     presenter = new MediaPhotoPagerPresenter();
     presenter.setView(this);
     presenter.init();
-    setListeners();
+    //setListeners();
     setupViewPager(viewpager);
-    return v;
   }
 
   @Override
@@ -121,13 +124,15 @@ public class MediaPhotoPagerFragment extends Fragment implements MediaPhotoPager
           if (radioGroup.getCheckedRadioButtonId() != R.id.rb_photo) {
             radioGroup.check(R.id.rb_photo);
           }
-          MediaPhotoFragment.newInstance().addListener();
+          if(mediaPhotoFragment != null)
+            mediaPhotoFragment.newInstance().addListener();
           VideoListFragment.newInstance().removeListener();
         } else if (position == 1){
           if (radioGroup.getCheckedRadioButtonId() != R.id.rb_video) {
             radioGroup.check(R.id.rb_video);
           }
-          MediaPhotoFragment.newInstance().removeListener();
+          if(mediaPhotoFragment != null)
+            mediaPhotoFragment.newInstance().removeListener();
           VideoListFragment.newInstance().addListener();
         }
       }
@@ -158,10 +163,16 @@ public class MediaPhotoPagerFragment extends Fragment implements MediaPhotoPager
     clPagerButtons.setVisibility(View.VISIBLE);
   }
 
+  @Override
+  public void updateGallery() {
+
+  }
+
 
   private void setupViewPager(ViewPager viewPager) {
+    mediaPhotoFragment = new MediaPhotoFragment();
     ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-    adapter.addFragment(MediaPhotoFragment.newInstance(), ConstantUtils.MEDIA_PHOTO_FRAGMENT);
+    adapter.addFragment(mediaPhotoFragment.newInstance(), ConstantUtils.MEDIA_PHOTO_FRAGMENT);
     adapter.addFragment(VideoListFragment.newInstance(), ConstantUtils.VIDEO_LIST_FRAGMENT);
     viewPager.setAdapter(adapter);
   }

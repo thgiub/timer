@@ -1,9 +1,12 @@
 package ru.kamaz.itis.timer.gallery.ui.ui.photo;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import android.content.Intent;
+
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,15 +14,12 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.Picasso;
 
+import com.bumptech.glide.Glide;
 
 
 import java.io.Serializable;
-import java.util.Collections;
 import java.util.List;
 
 import butterknife.BindView;
@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 import ru.kamaz.itis.timer.R;
 import ru.kamaz.itis.timer.gallery.HelperUtils;
 import ru.kamaz.itis.timer.gallery.constants.ConstantUtils;
-import ru.kamaz.itis.timer.gallery.domain.Photo;
+import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 import ru.kamaz.itis.timer.gallery.domain.interfaces.photo.MediaPhotoInterface;
 import ru.kamaz.itis.timer.gallery.presentation.PhotoViewActivity;
 
@@ -43,11 +43,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         this.galleryList = galleryList;
         this.context = context;
         this.presenter = presenter;
-        //Collections.reverse(galleryList);
     }
-
-
-
 
     @NonNull
     @Override
@@ -58,13 +54,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
-        viewHolder.img.setScaleType(ImageView.ScaleType.FIT_CENTER);
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, @SuppressLint("RecyclerView") final int i) {
 
-        Picasso.get().load(HelperUtils.getUri(context, galleryList.get(i).getImagePath()))
-                .resize(240, 240).centerCrop().into(viewHolder.img);
+        viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-
+        Glide.with(context)
+                .load(HelperUtils.getUri(context, galleryList.get(i).getImagePath()))
+                .into(viewHolder.img);
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

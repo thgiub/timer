@@ -5,7 +5,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import static androidx.constraintlayout.widget.Constraints.TAG;
+import static android.content.ContentValues.TAG;
+
+//import static androidx.constraintlayout.widget.Constraints.TAG;
 
 class MyApplicationInterface {
     private final StorageUtils storageUtils;

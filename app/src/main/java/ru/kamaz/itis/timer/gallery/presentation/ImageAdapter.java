@@ -2,14 +2,15 @@ package ru.kamaz.itis.timer.gallery.presentation;
 
 import android.content.Context;
 
+
+import android.support.annotation.NonNull;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import androidx.annotation.NonNull;
-import androidx.viewpager.widget.PagerAdapter;
-import androidx.viewpager.widget.ViewPager;
 
 import com.squareup.picasso.Picasso;
 
@@ -21,7 +22,7 @@ import java.util.List;
 import ru.kamaz.itis.timer.R;
 import ru.kamaz.itis.timer.gallery.HelperUtils;
 import ru.kamaz.itis.timer.gallery.TouchImageView;
-import ru.kamaz.itis.timer.gallery.domain.Photo;
+import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 
 
 class ImageAdapter extends PagerAdapter {

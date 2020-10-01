@@ -1,22 +1,26 @@
 package ru.kamaz.itis.timer.gallery.ui.ui.video;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
-import android.database.DataSetObserver;
+
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.RecyclerView;
+//import androidx.annotation.NonNull;
+//import androidx.fragment.app.FragmentActivity;
+//import androidx.recyclerview.widget.RecyclerView;
+
+
 
 import com.bumptech.glide.Glide;
 
@@ -26,7 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import ru.kamaz.itis.timer.R;
 import ru.kamaz.itis.timer.gallery.HelperUtils;
-import ru.kamaz.itis.timer.gallery.domain.EnumFileType;
+import ru.kamaz.itis.timer.gallery.domain.domain.EnumFileType;
 import ru.kamaz.itis.timer.gallery.domain.domain.Media;
 import ru.kamaz.itis.timer.gallery.domain.interfaces.video.VideoInterface;
 
@@ -53,7 +57,7 @@ class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> {
     return new ViewHolder(view);
   }
 
-  public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int i) {
+  public void onBindViewHolder(@NonNull ViewHolder viewHolder, @SuppressLint("RecyclerView") final int i) {
     final Media media = videoList.get(i);
     viewHolder.title.setText(media.title);
     viewHolder.img.setScaleType(ImageView.ScaleType.CENTER_CROP);

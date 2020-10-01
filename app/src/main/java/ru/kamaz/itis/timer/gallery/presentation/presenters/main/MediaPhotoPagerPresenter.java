@@ -78,4 +78,11 @@ public class MediaPhotoPagerPresenter implements MediaPhotoPagerInterface.Presen
     public void addListener(boolean bool) {
 
     }
+
+    @Override
+    public void updateGallery() {
+
+    }
+
+
 }

@@ -1,8 +1,9 @@
 package ru.kamaz.itis.timer.gallery.domain.domain;
 
-import androidx.annotation.Nullable;
+//import androidx.annotation.Nullable;
 
-import ru.kamaz.itis.timer.gallery.domain.EnumFileType;
+
+import android.support.annotation.Nullable;
 
 public class Media {
 
@@ -19,17 +20,6 @@ public class Media {
   public String thumb;
   public EnumFileType type;
 
-  public Media(long _id, @Nullable String _title, @Nullable String _displayName, double _duration,
-               String _path, @Nullable String _artist, @Nullable String _thumb, EnumFileType _type) {
-    this.id = _id;
-    this.title = _title;
-    this.displayName = _displayName;
-    this.duration = _duration;
-    this.path = _path;
-    this.artist = _artist;
-    this.thumb = _thumb;
-    this.type = _type;
-  }
 
   public Media(long _id, @Nullable String _title, @Nullable String _displayName, double _duration,
                String _path, @Nullable String _artist, EnumFileType _type) {
@@ -41,6 +31,7 @@ public class Media {
     this.artist = _artist;
     this.type = _type;
   }
+
 
   public Media() {
     super();

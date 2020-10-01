@@ -9,6 +9,7 @@ public interface MainInteractorInterface  {
         void deleteSelectedItems();
         void removeListener(boolean bool);
         void addListener(boolean bool);
+        void updateGallery();
     }
 
 

@@ -7,6 +7,7 @@ public interface MediaPhotoPagerInterface {
         void initVars();
         void showEditButton();
         void showPagerButton();
+        void updateGallery();
     }
     interface Presenter{
         void init();
@@ -15,6 +16,7 @@ public interface MediaPhotoPagerInterface {
         void onPause();
         void onShareButtonClicked();
         void onDeleteButtonClicked();
+
         void onListenerPagerPosition(boolean bool);
     }
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import ru.kamaz.itis.timer.gallery.domain.interfaces.interactors.MainInteractorInterface;
+import ru.kamaz.itis.timer.presenter.MainActivityPresenter;
 
 public class MainInteractor {
     private static MainInteractor instance;
@@ -35,6 +36,10 @@ public class MainInteractor {
         for (MainInteractorInterface.MediaListener listener : listeners)
             listener.deleteSelectedItems();
     }
+    public void updateGalleryAfterPhoto() {
+        for (MainInteractorInterface.MediaListener listener : listeners)
+            listener.updateGallery();
+    }
 
     public void shareSelectedItems() {
         for (MainInteractorInterface.MediaListener listener : listeners)
@@ -59,10 +64,12 @@ public class MainInteractor {
     }
     public void listenersAdd(boolean bool){
 
-        for (MainInteractorInterface.MediaListener listener : listeners){
-            listener.addListener(bool);
-        }
+//        for (MainInteractorInterface.MediaListener listener : listeners){
+//            listener.addListener(bool);
+//        }
     }
+
+
 
 
 }

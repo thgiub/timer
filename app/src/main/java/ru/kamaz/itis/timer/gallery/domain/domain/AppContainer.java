@@ -2,8 +2,6 @@ package ru.kamaz.itis.timer.gallery.domain.domain;
 
 import java.util.List;
 
-import ru.kamaz.itis.timer.gallery.domain.AppData;
-
 public class AppContainer {
   public List<AppData> appData;
   public int height = 1;

@@ -1,14 +1,16 @@
 package ru.kamaz.itis.timer;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+//import androidx.annotation.NonNull;
+//import androidx.appcompat.app.AppCompatActivity;
+//import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.KeyguardManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,12 +21,17 @@ import android.graphics.Point;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
@@ -37,16 +44,21 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import ru.kamaz.itis.timer.gallery.GalleryActivity;
 
-import ru.kamaz.itis.timer.gallery.domain.Photo;
+import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
+import ru.kamaz.itis.timer.gallery.presentation.MediaScannerBroadcast;
 import ru.kamaz.itis.timer.presenter.MainActivityPresenter;
 import ru.kamaz.itis.timer.ui.MainActivityInterface;
 
@@ -55,8 +67,8 @@ import static ru.kamaz.itis.timer.CameraHelper.MEDIA_TYPE_IMAGE;
 import static ru.kamaz.itis.timer.CameraHelper.MEDIA_TYPE_VIDEO;
 import static ru.kamaz.itis.timer.CameraHelper.getOutputMediaFile;
 
-public class MainActivity extends AppCompatActivity implements MainActivityInterface.View {
-
+public class MainActivity extends AppCompatActivity implements MainActivityInterface.View, MediaScannerBroadcast.MediaScannerBroadcastListener {
+   // private MediaPhotoFragment mediaPhotoFragment;
     private MainActivityInterface.Presenter presenter;
     private MyApplicationInterface applicationInterface;
     private Chronometer timer;
@@ -66,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
     private MediaRecorder mediaRecorder;
     boolean howModNow =true;
     private File mOutputFile;
+    private CameraHelper helperCam;
     private boolean isRecording = false;
     private Button  videoMode;
     private String TAG="sdsd";
@@ -81,10 +94,12 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
     Bitmap bitmap = null;
     private static final int MEDIA_RECORDER_REQUEST = 0;
     public ImageButton bt_gallery;
+    private MediaScannerBroadcast broadcast;
 
     private final String[] requiredPermissions = {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA,
     };
     @Override
@@ -97,7 +112,13 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         presenter = new MainActivityPresenter();
         presenter.setView(this);
         presenter.init();
+        videoMode.setVisibility(View.VISIBLE);
+        photoMode.setVisibility(View.VISIBLE);
+       //requestCameraPermissions();
+       //mediaPhotoFragment = new MediaPhotoFragment();
     }
+
+
 
     @Override
     public void initVars() {
@@ -108,12 +129,18 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         camPreview = new CameraPreview(this, mCamera);
         ViewGroup.LayoutParams photoParams = photoMode.getLayoutParams();
         ViewGroup.LayoutParams videoParams = videoMode.getLayoutParams();
-        photoMode.setTextColor(Color.GREEN);
-        videoMode.setTextColor(Color.BLACK);
+        photoMode.setTextColor(Color.BLUE);
+        videoMode.setTextColor(Color.WHITE);
         photoMode.setLayoutParams(photoParams);
         videoMode.setLayoutParams(videoParams);
         photoVideoButton = (ImageButton)findViewById(R.id.bt_PhotoVideo);
         bt_gallery = (ImageButton)findViewById(R.id.bt_gallery);
+        broadcast = new MediaScannerBroadcast(this);
+    }
+
+    @Override
+    public void updateGalleryList() {
+
     }
 
     @Override
@@ -121,18 +148,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         photoMode.setOnClickListener(new View.OnClickListener() {
             public void onClick(View View) {
                 if(!howModNow){
-                    photoVideoButton.setImageResource(R.drawable.white_circle);
+                    photoVideoButton.setImageResource(R.drawable.circle_white);
                     howModNow=true;
                     DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                     ViewGroup.LayoutParams videoParams = videoMode.getLayoutParams();
-                    //videoParams.height=  height-5;
                     ViewGroup.LayoutParams photoParams = photoMode.getLayoutParams();
-                    // photoParams.height= height+5;
-                    photoMode.setTextColor(Color.GREEN);
-                    videoMode.setTextColor(Color.BLACK);
+                    photoMode.setTextColor(Color.BLUE);
+                    videoMode.setTextColor(Color.WHITE);
                     videoMode.setLayoutParams(videoParams);
                     photoMode.setLayoutParams(photoParams);
-                   // updateGalleryIcon(true);
 
                 }else {
 
@@ -148,16 +172,15 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         videoMode.setOnClickListener(new View.OnClickListener() {
             public void onClick(View View) {
                 if(howModNow){
-                    photoVideoButton.setImageResource(R.drawable.video_btn);
+                    photoVideoButton.setImageResource(R.drawable.circle_red);
                     howModNow=false;
                     DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
                     ViewGroup.LayoutParams videoParams = videoMode.getLayoutParams();
                     ViewGroup.LayoutParams photoParams = photoMode.getLayoutParams();
-                    photoMode.setTextColor(Color.BLACK);
-                    videoMode.setTextColor(Color.GREEN);
+                    photoMode.setTextColor(Color.WHITE);
+                    videoMode.setTextColor(Color.BLUE);
                     videoMode.setLayoutParams(videoParams);
                     photoMode.setLayoutParams(photoParams);
-                    //updateGalleryIcon(false);
 
                 }else {
 
@@ -166,9 +189,28 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         });
         photoVideoButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View View) {
+
                 if(!howModNow){
                     if (areCameraPermissionGranted()){
                         videoRecoding();
+                        photoVideoButton.setClickable(false);
+                        DateFormat beforeRecordingVideo= new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    Thread.sleep(1000);
+                                    photoVideoButton.setClickable(true);
+
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                        }
+                        ).start();
+
                     } else {
                         requestCameraPermissions();
                     }
@@ -176,6 +218,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                 }else {
                     takePhoto();
                     photoVideoButton.setEnabled(false);
+                   bt_gallery.setImageBitmap(null);
+                    updateGalleryIcon();
                 }
             }
         });
@@ -219,11 +263,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         int top = galleryButton.getPaddingTop();
         int right = galleryButton.getPaddingRight();
         int left = galleryButton.getPaddingLeft();
-	    /*if( MyDebug.LOG )
-			Log.d(TAG, "padding: " + bottom);*/
+
         galleryButton.setImageBitmap(null);
         galleryButton.setImageResource(R.drawable.baseline_photo_library_white_48);
-        // workaround for setImageResource also resetting padding, Android bug
+
         galleryButton.setPadding(left, top, right, bottom);
         gallery_bitmap = null;
     }
@@ -234,14 +277,27 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         galleryButton.setImageBitmap(thumbnail);
         gallery_bitmap = thumbnail;
     }
+    private boolean last_continuous_fast_burst; // whether the last photo operation was a continuous_fast_burst
 
+
+void savingImage(final boolean started) {
+    if( MyDebug.LOG )
+        Log.d(TAG, "savingImage: " + started);
+
+    this.runOnUiThread(new Runnable() {
+        public void run() {
+
+
+        }
+    });
+}
+    @SuppressLint("StaticFieldLeak")
     public void updateGalleryIcon() {
         long debug_time = 0;
         if( MyDebug.LOG ) {
             Log.d(TAG, "updateGalleryIcon");
             debug_time = System.currentTimeMillis();
         }
-
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String ghost_image_pref = sharedPreferences.getString(PreferenceKeys.GhostImagePreferenceKey, "preference_ghost_image_off");
         final boolean ghost_image_last = ghost_image_pref.equals("preference_ghost_image_last");
@@ -249,10 +305,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
             private static final String TAG = "MainActivity/AsyncTask";
             private boolean is_video;
 
-            /** The system calls this to perform work in a worker thread and
-             * delivers it the parameters given to AsyncTask.execute() */
             protected Bitmap doInBackground(Void... params) {
-
                 StorageUtils.Media media = applicationInterface
                         .getStorageUtils()
                         .getLatestMedia();
@@ -364,8 +417,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                 return thumbnail;
             }
 
-            /** The system calls this to perform work in the UI thread and delivers
-             * the result from doInBackground() */
+            @SuppressLint("StaticFieldLeak")
             protected void onPostExecute(Bitmap thumbnail) {
                 if( MyDebug.LOG )
                     Log.d(TAG, "onPostExecute");
@@ -384,47 +436,51 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                 }
             }
         }.execute();
-
         if( MyDebug.LOG )
             Log.d(TAG, "updateGalleryIcon: total time to update gallery icon: " + (System.currentTimeMillis() - debug_time));
     }
 
-
-
-
     @Override
     protected void onPause() {
+        presenter.onPause();
         super.onPause();
         releaseMediaRecorder();       // if you are using MediaRecorder, release it first
         releaseCamera();              // release the camera immediately on pause event
         preview.removeView(camPreview);
         camPreview = null;
+
+        unregisterReceiver(broadcast);
     }
 
     @Override
     protected void onResume() {
+        presenter.onResume();
         if (mCamera == null) {
             mCamera = getCameraInstance(0);
-           // CameraPreview.setCameraDisplayOrientation(this,0,mCamera);
             camPreview = new CameraPreview(this, mCamera);
             preview.addView(camPreview);
         }
         updateGalleryIcon();
         super.onResume();
+        IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        intentFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+        intentFilter.addDataScheme("file");
+        intentFilter.addDataScheme("content");
+        registerReceiver(broadcast, intentFilter);
     }
 
     private void releaseMediaRecorder(){
         if (mediaRecorder != null) {
-            mediaRecorder.reset();   // clear recorder configuration
-            mediaRecorder.release(); // release the recorder object
+            mediaRecorder.reset();
+            mediaRecorder.release();
             mediaRecorder = null;
-            mCamera.lock();           // lock camera for later use
+            mCamera.lock();
         }
     }
 
     private void releaseCamera(){
         if (mCamera != null){
-            mCamera.release();        // release the camera for other applications
+            mCamera.release();
             mCamera = null;
         }
     }
@@ -465,8 +521,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         if (areAllPermissionsGranted){
             startCapture();
         } else {
-            // User denied one or more of the permissions, without these we cannot record
-            // Show a toast to inform the user.
+
             Toast.makeText(getApplicationContext(),
                     getString(R.string.app_name),
                     Toast.LENGTH_SHORT)
@@ -479,14 +534,10 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         @Override
         public void onPictureTaken(byte[] data, Camera camera) {
 
-            camera.startPreview();
-
             File pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
-            //camPreview = new CameraPreview(MainActivity.this, mCamera);
 
             if (pictureFile == null){
                 Log.d(TAG, "Error creating media file, check storage permissions");
-                //camPreview = new CameraPreview(MainActivity.this, mCamera);
                 return;
             }
 
@@ -499,19 +550,23 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                     } catch (IOException e) {
                         Log.d(TAG, "Error accessing file: " + e.getMessage());
                     }
-//                }
-//            }).start();
+
             photoVideoButton.setEnabled(true);
 
             camera.startPreview();
+
         }
     };
     private boolean videoRecoding(){
         if(isRecording){
-            // stop recording and release camera
-            mediaRecorder.stop();  // stop the recording
-            releaseMediaRecorder(); // release the MediaRecorder object
-            mCamera.lock();         // take camera access back from MediaRecorder
+            mediaRecorder.stop();
+            releaseMediaRecorder();
+            bt_gallery.setClickable(true);
+            photoMode.setClickable(true);
+            bt_gallery.setVisibility(View.VISIBLE);
+            photoMode.setVisibility(View.VISIBLE);
+            videoMode.setClickable(true);
+            videoMode.setVisibility(View.VISIBLE);
             timer.setVisibility(View.INVISIBLE);
             timer.setBase(SystemClock.elapsedRealtime());
             offsite=0;
@@ -519,21 +574,29 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
             isRecording = false;
         }else {
             if(prepareVideoRecorder()){
+                isRecording= true;
                 mediaRecorder.start();
+                bt_gallery.setClickable(false);
+                photoMode.setClickable(false);
+                bt_gallery.setVisibility(View.INVISIBLE);
+                photoMode.setVisibility(View.INVISIBLE);
+                videoMode.setClickable(false);
+                videoMode.setVisibility(View.INVISIBLE);
                 timer.setVisibility(View.VISIBLE);
                 timer.setBase(SystemClock.elapsedRealtime()- offsite);
-
                 timer.start();
-                isRecording= true;
             }else releaseMediaRecorder();
         }
+
 
         return false;
     }
     private boolean takePhoto(){
         mCamera.takePicture(null, null, mPicture);
+        updateGalleryIcon();
         return false;
     }
+
     private boolean prepareVideoRecorder(){
         releaseCamera();
         releaseMediaRecorder();
@@ -541,8 +604,11 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         Camera.Parameters parameters = mCamera.getParameters();
         List<Camera.Size> mSupportedPreviewSizes = parameters.getSupportedPreviewSizes();
         List<Camera.Size> mSupportedVideoSizes = parameters.getSupportedVideoSizes();
-        Camera.Size optimalSize = CameraHelper.getOptimalVideoSize(mSupportedVideoSizes,
-                mSupportedPreviewSizes, preview.getWidth(), preview.getHeight());
+        Camera.Size optimalSize = CameraHelper
+                .getOptimalVideoSize(mSupportedVideoSizes,
+                        mSupportedPreviewSizes,
+                        preview.getWidth(),
+                        preview.getHeight());
         CamcorderProfile profile = CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH);
         profile.videoFrameWidth = optimalSize.width;
         profile.videoFrameHeight = optimalSize.height;
@@ -553,9 +619,19 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         mediaRecorder.setCamera(mCamera);
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.CAMCORDER);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
-        mediaRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_HIGH));
+        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT);
+        mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mediaRecorder.setVideoEncodingBitRate(700*1024);
+        mediaRecorder.setVideoSize(640,360);
         mediaRecorder.setOutputFile(getOutputMediaFile(MEDIA_TYPE_VIDEO).toString());
-        mediaRecorder.setPreviewDisplay(camPreview.getHolder().getSurface());
+        if(mCamera!=null){
+            mediaRecorder.setPreviewDisplay(camPreview.getHolder().getSurface());
+        }else {
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Камера нет", Toast.LENGTH_LONG);
+            toast.show();
+        }
         try {
             mediaRecorder.prepare();
         } catch (IllegalStateException e) {
@@ -569,6 +645,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         }
         return true;
     }
+
+
     private void startCapture(){
         if (isRecording) {
             try {
@@ -620,14 +698,24 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         return c; // returns null if camera is unavailable
     }
 
+    @Override
+    public void onPointerCaptureChanged(boolean hasCapture) {
+
+    }
+
+    @Override
+    public void mediaScannerBroadcastCallback() {
+        updateGalleryIcon();
+    }
+
     class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {
 
 
         @Override
+
         protected Boolean doInBackground(Void... voids) {
 
             if (prepareVideoRecorder()) {
-
                 mediaRecorder.start();
                 isRecording = true;
 
