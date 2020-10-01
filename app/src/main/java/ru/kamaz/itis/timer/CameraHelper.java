@@ -109,7 +109,7 @@ public class CameraHelper {
         return optimalSize;
     }
 
-    public static Camera getDefaultCameraInstance() { return Camera.open();
+    public static Camera getDefaultCameraInstance() { return Camera.open(0);
     }
 
     public static Camera getDefaultBackFacingCameraInstance() {
