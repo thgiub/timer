@@ -100,10 +100,11 @@ class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.ViewHolder> {
       @Override
       public void onClick(View v) {
         if (media.type == EnumFileType.VIDEO) {
+          if(!presenter.isEditMode()){
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(HelperUtils.getUri(context, media.path), "video/*");
+            context.startActivity(intent);}
 
-          Intent intent = new Intent(Intent.ACTION_VIEW);
-          intent.setDataAndType(HelperUtils.getUri(context, media.path), "video/*");
-          context.startActivity(intent);
         }
       }
     });

@@ -10,20 +10,24 @@ import android.view.SurfaceView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.time.Instant;
+
+import ru.kamaz.itis.timer.interfaces.OnSurfaceCreatedListener;
 
 import static android.content.ContentValues.TAG;
 
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
+    private OnSurfaceCreatedListener surfaceListener;
 
-    public CameraPreview(Context context, Camera camera) {
+    public CameraPreview(Context context, Camera camera, OnSurfaceCreatedListener listener) {
         super(context);
         mCamera = camera;
         mHolder = getHolder();
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-
+        surfaceListener = listener;
     }
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -34,20 +38,20 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
-        // The Surface has been created, now tell the camera where to draw the preview.
+
         try {
             if (mCamera!=null){
                 mCamera.setPreviewDisplay(holder);
                 mCamera.startPreview();
+                surfaceListener.onSurfaceCreated();
             }else {
-                Toast toast = Toast.makeText(getContext(),
-                        "Камера нет", Toast.LENGTH_LONG);
-                toast.show();
-
+               //mCamera.stopPreview();
+                surfaceListener.onCreateSurfaceFailed();
             }
 
         } catch (IOException e) {
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+            surfaceListener.onCreateSurfaceFailed();
         }
     }
 

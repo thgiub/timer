@@ -59,6 +59,7 @@ import ru.kamaz.itis.timer.gallery.GalleryActivity;
 
 import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 import ru.kamaz.itis.timer.gallery.presentation.MediaScannerBroadcast;
+import ru.kamaz.itis.timer.interfaces.OnSurfaceCreatedListener;
 import ru.kamaz.itis.timer.presenter.MainActivityPresenter;
 import ru.kamaz.itis.timer.ui.MainActivityInterface;
 
@@ -67,7 +68,7 @@ import static ru.kamaz.itis.timer.CameraHelper.MEDIA_TYPE_IMAGE;
 import static ru.kamaz.itis.timer.CameraHelper.MEDIA_TYPE_VIDEO;
 import static ru.kamaz.itis.timer.CameraHelper.getOutputMediaFile;
 
-public class MainActivity extends AppCompatActivity implements MainActivityInterface.View, MediaScannerBroadcast.MediaScannerBroadcastListener {
+public class MainActivity extends AppCompatActivity implements MainActivityInterface.View, MediaScannerBroadcast.MediaScannerBroadcastListener, OnSurfaceCreatedListener {
    // private MediaPhotoFragment mediaPhotoFragment;
     private MainActivityInterface.Presenter presenter;
     private MyApplicationInterface applicationInterface;
@@ -126,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         photoMode = (Button) findViewById(R.id.photoMode);
         preview = (FrameLayout) findViewById(R.id.preview);
         timer = (Chronometer) findViewById(R.id.timer);
-        camPreview = new CameraPreview(this, mCamera);
+        camPreview = new CameraPreview(this, mCamera, this);
         ViewGroup.LayoutParams photoParams = photoMode.getLayoutParams();
         ViewGroup.LayoutParams videoParams = videoMode.getLayoutParams();
         photoMode.setTextColor(Color.BLUE);
@@ -457,7 +458,7 @@ void savingImage(final boolean started) {
         presenter.onResume();
         if (mCamera == null) {
             mCamera = getCameraInstance(0);
-            camPreview = new CameraPreview(this, mCamera);
+            camPreview = new CameraPreview(this, mCamera, this);
             preview.addView(camPreview);
         }
         updateGalleryIcon();
@@ -706,6 +707,19 @@ void savingImage(final boolean started) {
     @Override
     public void mediaScannerBroadcastCallback() {
         updateGalleryIcon();
+    }
+
+    @Override
+    public void onCreateSurfaceFailed() {
+        photoVideoButton.setClickable(false);
+        Toast toast = Toast.makeText(this,
+                "Камера нет", Toast.LENGTH_LONG);
+        toast.show();
+    }
+
+    @Override
+    public void onSurfaceCreated() {
+        photoVideoButton.setClickable(true);
     }
 
     class MediaPrepareTask extends AsyncTask<Void, Void, Boolean> {

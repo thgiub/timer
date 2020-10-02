@@ -61,15 +61,13 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         Glide.with(context)
                 .load(HelperUtils.getUri(context, galleryList.get(i).getImagePath()))
                 .into(viewHolder.img);
-        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        viewHolder.itemView.setOnClickListener(v -> {
+            if(!presenter.isEditMode()){
                 Intent intent = new Intent(context, PhotoViewActivity.class);
                 intent.putExtra(ConstantUtils.BUNDLE_PHOTO_ID, galleryList.get(i).getPhotoId());
                 intent.putExtra(ConstantUtils.BUNDLE_PHOTOS_LIST, (Serializable) galleryList);
                 intent.putExtra(ConstantUtils.BUNDLE_LIST_SELECT_POSITION, i);
                 context.startActivity(intent);
-             // presenter.onPhotoClicked(i);
             }
         });
 
@@ -109,7 +107,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     }
 
     public void updateData(List<Photo> data) {
-        galleryList.clear();
+        if(galleryList!=null){
+            galleryList.clear();
+        }
 
         if (data != null)
             galleryList.addAll(data);
