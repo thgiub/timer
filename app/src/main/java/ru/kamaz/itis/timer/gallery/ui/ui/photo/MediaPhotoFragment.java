@@ -29,7 +29,6 @@ import android.widget.Toast;
 //import androidx.recyclerview.widget.RecyclerView;
 
 
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -55,8 +54,8 @@ public class MediaPhotoFragment extends Fragment implements MediaScannerBroadcas
     @BindView(R.id.rv_image_gallery)
     RecyclerView rvImageGallery;
 
- /*   @BindView(R.id.button_update)
-    Button btnUpdate;*/
+    /*   @BindView(R.id.button_update)
+       Button btnUpdate;*/
     Unbinder unbinder;
 
     private MediaScannerBroadcast broadcast;
@@ -69,12 +68,12 @@ public class MediaPhotoFragment extends Fragment implements MediaScannerBroadcas
     @SuppressLint("ValidFragment")
 
 
- public static MediaPhotoFragment newInstance() {
-    if (instance == null) {
-      instance = new MediaPhotoFragment();
+    public static MediaPhotoFragment newInstance() {
+        if (instance == null) {
+            instance = new MediaPhotoFragment();
+        }
+        return instance;
     }
-    return instance;
-  }
 
     @Override
     public void onAttach(Context context) {
@@ -224,7 +223,7 @@ public class MediaPhotoFragment extends Fragment implements MediaScannerBroadcas
         galleryList.clear();
         galleryList = HelperUtils.getPhotoList(context, null);
         //galleryList = HelperUtils.getPhotoList(context, null);
-        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE,Uri.parse("file://" + Environment.getExternalStorageDirectory())));
+        context.sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" + Environment.getExternalStorageDirectory())));
         photoAdapter.updateData(galleryList);
     }
 
@@ -257,14 +256,13 @@ public class MediaPhotoFragment extends Fragment implements MediaScannerBroadcas
 
     @Override
     public void initContent() {
-        if(getArguments() != null){
+        if (getArguments() != null) {
             long bucketId = getArguments().getLong(ConstantUtils.BUNDLE_ALBUM_ID);
             List<Photo> list = HelperUtils.getPhotoList(context, bucketId);
             photoAdapter = new PhotoAdapter(context, list, presenter);
-        }
-        else {
+        } else {
             List<Photo> list = HelperUtils.getPhotoList(context, null);
-            photoAdapter = new PhotoAdapter(context, list,presenter);
+            photoAdapter = new PhotoAdapter(context, list, presenter);
         }
         rvImageGallery.setAdapter(photoAdapter);
     }

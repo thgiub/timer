@@ -173,66 +173,7 @@ public class HelperUtils {
     alarmManager.setTimeZone(stringBuilder);
   }
 
-  /*public static @Nullable
-  List<Audio> getMusicList(Context context, @Nullable String selection) {
-    List<Audio> musicList = null;
-    try {
-      ContentResolver contentResolver = context.getContentResolver();
-      Uri songUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-      Cursor songCursor = contentResolver
-          .query(songUri, null, selection, null, MediaStore.Audio.Media.TITLE);
 
-      if (songCursor != null && songCursor.moveToFirst()) {
-        musicList = new ArrayList();
-        int songId = songCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-        int songTitle = songCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-        int songDisplayName = songCursor.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME);
-        int songDuration = songCursor.getColumnIndex(MediaStore.Audio.Media.DURATION);
-        int songData = songCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-        int songArtist = songCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-        int songAlbum = songCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
-
-        do {
-          if (Looper.myLooper() != Looper.getMainLooper() &&
-              Thread.currentThread().isInterrupted()) {
-            Thread.currentThread().interrupt();
-            return null;
-          }
-          long currentId = songCursor.getLong(songId);
-          String currentTitle = songCursor.getString(songTitle);
-          String displayName = songCursor.getString(songDisplayName);
-          Double duration = songCursor.getDouble(songDuration);
-          String path = songCursor.getString(songData);
-          String artist = songCursor.getString(songArtist);
-          String albumId = songCursor.getString(songAlbum);
-
-          String albumCoverPath = null;
-          Cursor cursor = context.getContentResolver()
-              .query(MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
-                  new String[]{MediaStore.Audio.Albums._ID, MediaStore.Audio.Albums.ALBUM_ART},
-                  MediaStore.Audio.Albums._ID + "=?", new String[]{String.valueOf(albumId)}, null);
-
-          if (cursor != null && cursor.moveToFirst()) {
-            albumCoverPath = cursor
-                .getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM_ART));
-            cursor.close();
-          }
-          musicList.add(new Audio(currentId, currentTitle, displayName, duration, path, artist,
-              albumCoverPath));
-        } while (songCursor.moveToNext());
-
-        Log.d(ConstantUtils.LOG_TAG, "songCursor size = " + musicList.size());
-      } else {
-        Log.d(ConstantUtils.LOG_TAG, "songCursor size = 0 or null");
-      }
-      if (songCursor != null) {
-        songCursor.close();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-    return musicList;
-  }*/
 
   public static int getMusicCount(Context context, @Nullable String selection) {
     int count = 0;
@@ -253,68 +194,7 @@ public class HelperUtils {
     return count;
   }
 
-  /*@Nullable
-  public static List<AudioAlbum> getAlbums(Context context) {
-    List<AudioAlbum> dataList = null;
-    ContentResolver contentResolver = context.getContentResolver();
-    Uri songUri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-    Cursor cursor = contentResolver.query(songUri, null, null, null, null);
-    if (cursor != null && cursor.moveToFirst()) {
-      dataList = new ArrayList();
-      do {
-        AudioAlbum audioAlbum = new AudioAlbum();
-        audioAlbum.setAlbumId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums._ID)));
-        audioAlbum
-            .setAlbumTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)));
-        audioAlbum.setAlbumArtist(
-            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST)));
-        audioAlbum.setSoundCount(
-            cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Albums.NUMBER_OF_SONGS)));
 
-        dataList.add(audioAlbum);
-      } while (cursor.moveToNext());
-
-      Log.d(ConstantUtils.LOG_TAG, "getAlbums size = " + dataList.size());
-    } else {
-      Log.d(ConstantUtils.LOG_TAG, "getAlbums size = 0 or null");
-    }
-    if (cursor != null) {
-      cursor.close();
-    }
-    return dataList;
-  }
-
-  @Nullable
-  public static List<AudioArtist> getArtists(Context context) {
-    List<AudioArtist> dataList = null;
-    ContentResolver contentResolver = context.getContentResolver();
-    Uri songUri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-    Cursor cursor = contentResolver
-        .query(songUri, null, null, null, MediaStore.Audio.Artists.ARTIST);
-    if (cursor != null && cursor.moveToFirst()) {
-      dataList = new ArrayList();
-      do {
-        AudioArtist data = new AudioArtist();
-        data.setArtistId(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Artists._ID)));
-        data.setArtistTitle(
-            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST)));
-        data.setArtistAlbumsCount(
-            cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_ALBUMS)));
-        data.setArtistSoundsCount(
-            cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)));
-
-        dataList.add(data);
-      } while (cursor.moveToNext());
-
-      Log.d(ConstantUtils.LOG_TAG, "getArtists size = " + dataList.size());
-    } else {
-      Log.d(ConstantUtils.LOG_TAG, "getArtists size = 0 or null");
-    }
-    if (cursor != null) {
-      cursor.close();
-    }
-    return dataList;
-  }*/
 
   public static String getMacAddress(){
     try{
@@ -347,19 +227,18 @@ public class HelperUtils {
 
     return "";
   }
-
-
   @Nullable public static List<Photo> getPhotoList (Context context, @Nullable Long _bucketId)
   {
     List<Photo> list = null;
     ContentResolver contentResolver = context.getContentResolver();
     Uri songUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
     Cursor cursor = null;
+
     if (_bucketId != null && _bucketId != 0) {
       String selectionArg = MediaStore.Images.Media.BUCKET_ID + "=" + _bucketId;
       cursor = contentResolver.query(songUri, null, selectionArg, null, null);
     } else {
-      cursor = contentResolver.query(songUri, null, null, null, null);
+      cursor = contentResolver.query(songUri, null, null, null, "date_modified DESC");
     }
 
     if (cursor != null && cursor.moveToFirst()) {
@@ -387,9 +266,9 @@ public class HelperUtils {
     if (cursor != null) {
       cursor.close();
     }
-    if(list!=null){
-      Collections.reverse(list);
-    }
+   /* if(list!=null){
+    Collections.reverse(list);
+  }*/
     return list;
   }
 
@@ -588,7 +467,7 @@ Collections.reverse(photoList);
     Uri curUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
     String selection = path != null ? MediaStore.Video.Media.DATA + "='" + path + "'": null;
-    Cursor curCursor = contentResolver.query(curUri, null, selection, null, null);
+    Cursor curCursor = contentResolver.query(curUri, null, selection, null, "date_modified DESC");
 
     if(curCursor != null && curCursor.moveToFirst())
     {
@@ -608,9 +487,9 @@ Collections.reverse(photoList);
     } else {
       Log.d(ConstantUtils.LOG_TAG, "curCursor size = 0 or null");
     }
-    if(list!=null){
+  /*  if(list!=null){
       Collections.reverse(list);
-    }
+    }*/
     return list;
   }
 
@@ -687,19 +566,6 @@ Collections.reverse(photoList);
     }
   }
 
-  /*public static ArrayList<AlertTimeItem> getAlertTimeItems(Context context) {
-    ArrayList<AlertTimeItem> alertItems = new ArrayList<>();
-    alertItems.add(new AlertTimeItem(1, context.getString(R.string.calendarNo), null));
-    alertItems.add(new AlertTimeItem(2, context.getString(R.string.calendarOnSetTime), 0));
-    alertItems.add(new AlertTimeItem(3, context.getString(R.string.in5Min), -300));
-    alertItems.add(new AlertTimeItem(4, context.getString(R.string.in15Min), -900));
-    alertItems.add(new AlertTimeItem(5, context.getString(R.string.in30Min), -1800));
-    alertItems.add(new AlertTimeItem(6, context.getString(R.string.in1Hour), -3600));
-    alertItems.add(new AlertTimeItem(7, context.getString(R.string.in2Hour), -7200));
-    alertItems.add(new AlertTimeItem(8, context.getString(R.string.in1Day), -86400));
-    alertItems.add(new AlertTimeItem(9, context.getString(R.string.in2Day), -172800));
-    alertItems.add(new AlertTimeItem(10, context.getString(R.string.in1Week), -604800));
-    return alertItems;
-  }*/
+
 }
 

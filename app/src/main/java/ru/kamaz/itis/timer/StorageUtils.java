@@ -373,7 +373,7 @@ class StorageUtils {
                 Log.e(TAG, "don't have READ_EXTERNAL_STORAGE permission");
             return null;
         }
-
+        Cursor cursor = null;
         Media media = null;
         Uri baseUri = video ? MediaStore.Video.Media.EXTERNAL_CONTENT_URI : MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         final int column_id_c = 0;
@@ -388,10 +388,10 @@ class StorageUtils {
                 MediaStore.Images.ImageColumns.MIME_TYPE + "='image/x-adobe-dng'";
         String order = video ? MediaStore.Video.VideoColumns.DATE_TAKEN + " DESC," + MediaStore.Video.VideoColumns._ID + " DESC" : MediaStore.Images.ImageColumns.DATE_TAKEN + " DESC," + MediaStore.Images.ImageColumns._ID + " DESC";
 
-        Cursor cursor = null;
+
 
         try {
-            cursor = context.getContentResolver().query(baseUri, projection, null, null, null);
+            cursor = context.getContentResolver().query(baseUri, projection, selection, null, order);
             if( cursor != null && cursor.moveToFirst() ) {
                 if( MyDebug.LOG )
                     Log.d(TAG, "found: " + cursor.getCount());

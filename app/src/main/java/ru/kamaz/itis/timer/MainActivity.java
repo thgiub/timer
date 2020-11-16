@@ -31,6 +31,7 @@ import android.provider.MediaStore;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -45,6 +46,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 
+import com.bumptech.glide.Glide;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -57,6 +60,7 @@ import java.util.Locale;
 
 import ru.kamaz.itis.timer.gallery.GalleryActivity;
 
+import ru.kamaz.itis.timer.gallery.HelperUtils;
 import ru.kamaz.itis.timer.gallery.domain.domain.Photo;
 import ru.kamaz.itis.timer.gallery.presentation.MediaScannerBroadcast;
 import ru.kamaz.itis.timer.interfaces.OnSurfaceCreatedListener;
@@ -219,8 +223,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
                 }else {
                     takePhoto();
                     photoVideoButton.setEnabled(false);
-                   bt_gallery.setImageBitmap(null);
-                    updateGalleryIcon();
+                    bt_gallery.setImageBitmap(null);
+                  // updateGalleryIcon();
                 }
             }
         });
@@ -264,10 +268,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         int top = galleryButton.getPaddingTop();
         int right = galleryButton.getPaddingRight();
         int left = galleryButton.getPaddingLeft();
-
         galleryButton.setImageBitmap(null);
         galleryButton.setImageResource(R.drawable.baseline_photo_library_white_48);
-
         galleryButton.setPadding(left, top, right, bottom);
         gallery_bitmap = null;
     }
@@ -292,6 +294,11 @@ void savingImage(final boolean started) {
         }
     });
 }
+
+public void clearGalleryIcon(){
+    bt_gallery.setImageBitmap(null);
+}
+
     @SuppressLint("StaticFieldLeak")
     public void updateGalleryIcon() {
         long debug_time = 0;
@@ -302,30 +309,28 @@ void savingImage(final boolean started) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String ghost_image_pref = sharedPreferences.getString(PreferenceKeys.GhostImagePreferenceKey, "preference_ghost_image_off");
         final boolean ghost_image_last = ghost_image_pref.equals("preference_ghost_image_last");
+
         new AsyncTask<Void, Void, Bitmap>() {
             private static final String TAG = "MainActivity/AsyncTask";
             private boolean is_video;
 
             protected Bitmap doInBackground(Void... params) {
-                StorageUtils.Media media = applicationInterface
-                        .getStorageUtils()
-                        .getLatestMedia();
+                StorageUtils.Media media = applicationInterface.getStorageUtils().getLatestMedia();
                 Bitmap thumbnail = null;
+
                 KeyguardManager keyguard_manager = (KeyguardManager)MainActivity.this.getSystemService(Context.KEYGUARD_SERVICE);
                 boolean is_locked = keyguard_manager != null && keyguard_manager.inKeyguardRestrictedInputMode();
                 if( MyDebug.LOG )
                     Log.d(TAG, "is_locked?: " + is_locked);
                 if( media != null && getContentResolver() != null && !is_locked ) {
-                    // check for getContentResolver() != null, as have had reported Google Play crashes
+
                     if( ghost_image_last && !media.video ) {
                         if( MyDebug.LOG )
                             Log.d(TAG, "load full size bitmap for ghost image last photo");
                         try {
-                            //thumbnail = MediaStore.Images.Media.getBitmap(getContentResolver(), media.uri);
-                            // only need to load a bitmap as large as the screen size
+                            thumbnail = MediaStore.Images.Media.getBitmap(getContentResolver(), media.uri);
                             BitmapFactory.Options options = new BitmapFactory.Options();
                             InputStream is = getContentResolver().openInputStream(media.uri);
-                            // get dimensions
                             options.inJustDecodeBounds = true;
                             BitmapFactory.decodeStream(is, null, options);
                             int bitmap_width = options.outWidth;
@@ -333,8 +338,6 @@ void savingImage(final boolean started) {
                             Point display_size = new Point();
                             Display display = getWindowManager().getDefaultDisplay();
                             display.getSize(display_size);
-
-                            // align dimensions
                             if( display_size.x < display_size.y ) {
                                 display_size.set(display_size.y, display_size.x);
                             }
@@ -349,7 +352,6 @@ void savingImage(final boolean started) {
                                 Log.d(TAG, "display width: " + display_size.x);
                                 Log.d(TAG, "display height: " + display_size.y);
                             }
-                            // only care about height, to save worrying about different aspect ratios
                             options.inSampleSize = 1;
                             while( bitmap_height / (2*options.inSampleSize) >= display_size.y ) {
                                 options.inSampleSize *= 2;
@@ -358,7 +360,6 @@ void savingImage(final boolean started) {
                                 Log.d(TAG, "inSampleSize: " + options.inSampleSize);
                             }
                             options.inJustDecodeBounds = false;
-                            // need a new inputstream, see https://stackoverflow.com/questions/2503628/bitmapfactory-decodestream-returning-null-when-options-are-set
                             is.close();
                             is = getContentResolver().openInputStream(media.uri);
                             thumbnail = BitmapFactory.decodeStream(is, null, options);
@@ -461,7 +462,7 @@ void savingImage(final boolean started) {
             camPreview = new CameraPreview(this, mCamera, this);
             preview.addView(camPreview);
         }
-        updateGalleryIcon();
+       // updateGalleryIcon();
         super.onResume();
         IntentFilter intentFilter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
@@ -594,6 +595,7 @@ void savingImage(final boolean started) {
     }
     private boolean takePhoto(){
         mCamera.takePicture(null, null, mPicture);
+        clearGalleryIcon();
         updateGalleryIcon();
         return false;
     }
@@ -706,7 +708,7 @@ void savingImage(final boolean started) {
 
     @Override
     public void mediaScannerBroadcastCallback() {
-        updateGalleryIcon();
+       // updateGalleryIcon();
     }
 
     @Override
